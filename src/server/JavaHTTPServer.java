@@ -141,7 +141,7 @@ class HandlerAsVirtualServer implements Runnable {
             else { 
             // case2: method supported && file exists
                 try {   // GET or HEAD method
-                    // end with / means the root
+                    // end with '/' means the root
                     if (fileRequested.endsWith("/")) {
                         fileRequested += JavaHTTPServer.DEFAULT_FILE;
                     }
@@ -151,7 +151,28 @@ class HandlerAsVirtualServer implements Runnable {
                     String content = JavaHTTPServer.getContentType(fileRequested);
 
                     if (method.equals("GET")) { // GET method so we return content
+                        
+                        // send HTTP Headers
+                        headerOut.println("HTTP/1.1 200 OK");
+                        headerOut.println("Server: Java HTTP Server from Zhao Qihan : 1.0");
+                        headerOut.println("Date: " + new Date());
+                        headerOut.println("Content-type: " + content);
+                        headerOut.println("Content-length: " + fileLength);
+                        headerOut.println("Connection: Keep-Alive");
+                        
+                        headerOut.println(); // blank line between headers and content, very important !
+                        headerOut.flush(); // flush character output stream buffer
+                        
+                        // send HTTP Body
                         byte[] fileData = JavaHTTPServer.readFileDataInServer(file, fileLength);
+                        dataOut.write(fileData, 0, fileLength);
+                        dataOut.flush();
+
+                        if (JavaHTTPServer.VERBOSE) {
+                            System.out.println("File " + fileRequested + " of type " + content + " returned" + "\n");
+                        }
+
+                    }else if(method.equals("HEAD")) { // GET method so we return content
 
                         // send HTTP Headers
                         headerOut.println("HTTP/1.1 200 OK");
@@ -164,13 +185,13 @@ class HandlerAsVirtualServer implements Runnable {
                         headerOut.println(); // blank line between headers and content, very important !
                         headerOut.flush(); // flush character output stream buffer
 
-                        dataOut.write(fileData, 0, fileLength);
-                        dataOut.flush();
+                        if (JavaHTTPServer.VERBOSE) {
+                            System.out.println("Head of File " + fileRequested + " of type " + content + " returned" + "\n");
+                        }
+
                     }
 
-                    if (JavaHTTPServer.VERBOSE) {
-                        System.out.println("File " + fileRequested + " of type " + content + " returned" + "\n");
-                    }
+                    
                 } 
             // case3: method supported && file notFound
                 catch (FileNotFoundException fnfe) {
