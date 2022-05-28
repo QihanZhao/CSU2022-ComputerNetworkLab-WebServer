@@ -2,6 +2,7 @@
 Without any web framework. 
 
 # Design of the System
+![image](https://github.com/HanX-gthb/HanX-gthb-CSU2022-ComputerNetworkLab-WebServer/blob/main/structure.png)
 
 # Ref
 1.https://ssaurel.medium.com/create-a-simple-http-web-server-in-java-3fc12b29d5fd
